@@ -273,3 +273,10 @@ export const popularEvents: EventPreview[] = [
         isFeatured: false,
     },
 ];
+
+export const allDemoEvents: EventPreview[] = [
+    featuredEvent,
+    ...trendingEvents,
+    ...weekendEvents,
+    ...popularEvents,
+];
