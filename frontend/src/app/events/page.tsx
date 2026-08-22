@@ -1,6 +1,6 @@
 import { SiteFooter } from "@/components/layout/site-footer";
+import { getEvents } from "@/features/events/api/events-api";
 import { EventsExplorer } from "@/features/events/components/events-explorer";
-import { allDemoEvents } from "@/features/events/data/demo-events";
 import type {
     EventDateFilter,
     EventFilters,
@@ -55,10 +55,14 @@ export default async function EventsPage({
                 : "any",
     };
 
+    const { events } = await getEvents({
+        perPage: 24,
+    });
+
     return (
         <>
             <EventsExplorer
-                events={allDemoEvents}
+                events={events}
                 initialFilters={initialFilters}
             />
 
