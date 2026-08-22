@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', function () {
@@ -26,4 +27,6 @@ Route::prefix('v1')->group(function (): void {
         EventController::class,
         'show',
     ]);
+
+    Route::get('/home', HomeController::class);
 });

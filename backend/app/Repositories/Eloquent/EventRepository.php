@@ -9,6 +9,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class EventRepository implements EventRepositoryInterface
 {
@@ -134,30 +135,88 @@ class EventRepository implements EventRepositoryInterface
             return;
         }
 
-        $now = now();
-
-        $weekendStart = match (true) {
-            $now->isSaturday() => $now->copy()->startOfDay(),
-
-            $now->isSunday() => $now
-                ->copy()
-                ->subDay()
-                ->startOfDay(),
-
-            default => $now
-                ->copy()
-                ->next(CarbonInterface::SATURDAY)
-                ->startOfDay(),
-        };
-
-        $weekendEnd = $weekendStart
-            ->copy()
-            ->addDay()
-            ->endOfDay();
+        [$start, $end] = $this->weekendRange();
 
         $query->whereBetween('starts_at', [
-            $weekendStart,
-            $weekendEnd,
+            $start,
+            $end,
         ]);
+    }
+
+    public function findFeatured(): ?Event
+    {
+        return $this
+            ->homepageQuery()
+            ->where('is_featured', true)
+            ->orderBy('starts_at')
+            ->first();
+    }
+
+    public function trending(int $limit): Collection
+    {
+        return $this
+            ->homepageQuery()
+            ->where('is_trending', true)
+            ->orderBy('starts_at')
+            ->limit($limit)
+            ->get();
+    }
+
+    public function weekend(int $limit): Collection
+    {
+        [$start, $end] = $this->weekendRange();
+
+        return $this
+            ->homepageQuery()
+            ->where('is_featured', false)
+            ->where('is_trending', false)
+            ->whereBetween('starts_at', [
+                $start,
+                $end,
+            ])
+            ->orderBy('starts_at')
+            ->limit($limit)
+            ->get();
+    }
+
+    public function popular(int $limit): Collection
+    {
+        return $this
+            ->homepageQuery()
+            ->where('is_popular', true)
+            ->orderBy('starts_at')
+            ->limit($limit)
+            ->get();
+    }
+
+    private function homepageQuery(): Builder
+    {
+        return Event::query()
+            ->published()
+            ->where('starts_at', '>=', now())
+            ->with([
+                'category',
+                'venue',
+            ]);
+    }
+
+    private function weekendRange(): array
+    {
+        $now = now();
+
+        $start = $now->isSaturday()
+            ? $now->copy()->startOfDay()
+            : $now
+                ->copy()
+                ->next(CarbonInterface::SATURDAY)
+                ->startOfDay();
+
+        return [
+            $start,
+            $start
+                ->copy()
+                ->addDay()
+                ->endOfDay(),
+        ];
     }
 }

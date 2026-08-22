@@ -17,4 +17,16 @@ class CategoryRepository implements CategoryRepositoryInterface
             ->orderBy('name')
             ->get();
     }
+
+    public function forHomepage(int $limit): Collection
+    {
+        return Category::query()
+            ->withCount([
+                'events' => fn ($query) => $query->published(),
+            ])
+            ->whereNotNull('cover_image')
+            ->orderBy('id')
+            ->limit($limit)
+            ->get();
+    }
 }

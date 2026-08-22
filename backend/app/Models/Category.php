@@ -15,6 +15,8 @@ class Category extends Model
     protected $fillable = [
         'name',
         'slug',
+        'description',
+        'cover_image',
     ];
 
     public function events(): HasMany

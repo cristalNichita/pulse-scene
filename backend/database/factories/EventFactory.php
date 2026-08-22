@@ -72,6 +72,9 @@ class EventFactory extends Factory
             'is_featured' => false,
 
             'published_at' => now()->subDay(),
+
+            'is_trending' => false,
+            'is_popular' => false,
         ];
     }
 
@@ -108,6 +111,20 @@ class EventFactory extends Factory
     {
         return $this->state(fn (): array => [
             'price' => $price,
+        ]);
+    }
+
+    public function trending(): static
+    {
+        return $this->state(fn (): array => [
+            'is_trending' => true,
+        ]);
+    }
+
+    public function popular(): static
+    {
+        return $this->state(fn (): array => [
+            'is_popular' => true,
         ]);
     }
 }

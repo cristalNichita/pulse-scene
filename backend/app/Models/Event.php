@@ -34,6 +34,8 @@ class Event extends Model
         'status',
         'is_featured',
         'published_at',
+        'is_trending',
+        'is_popular',
     ];
 
     protected function casts(): array
@@ -46,6 +48,8 @@ class Event extends Model
             'minimum_age' => 'integer',
             'status' => EventStatus::class,
             'is_featured' => 'boolean',
+            'is_trending' => 'boolean',
+            'is_popular' => 'boolean',
             'published_at' => 'datetime',
         ];
     }

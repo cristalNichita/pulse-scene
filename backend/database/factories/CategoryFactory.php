@@ -18,6 +18,8 @@ class CategoryFactory extends Factory
         return [
             'name' => Str::title($name),
             'slug' => Str::slug($name),
+            'description' => fake()->sentence(),
+            'cover_image' => '/images/events/digital-art.jpeg',
         ];
     }
 }

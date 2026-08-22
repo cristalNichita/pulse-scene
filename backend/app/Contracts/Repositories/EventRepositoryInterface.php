@@ -5,6 +5,7 @@ namespace App\Contracts\Repositories;
 use App\DTOs\Event\EventFiltersData;
 use App\Models\Event;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 interface EventRepositoryInterface
 {
@@ -13,4 +14,12 @@ interface EventRepositoryInterface
     ): LengthAwarePaginator;
 
     public function findPublishedBySlug(string $slug): Event;
+
+    public function findFeatured(): ?Event;
+
+    public function trending(int $limit): Collection;
+
+    public function weekend(int $limit): Collection;
+
+    public function popular(int $limit): Collection;
 }
