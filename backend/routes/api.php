@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\HomeController;
@@ -29,4 +30,28 @@ Route::prefix('v1')->group(function (): void {
     ]);
 
     Route::get('/home', HomeController::class);
+
+    Route::prefix('auth')->group(function (): void {
+        Route::post('/register', [
+            AuthController::class,
+            'register',
+        ]);
+
+        Route::post('/login', [
+            AuthController::class,
+            'login',
+        ]);
+
+        Route::middleware('auth:sanctum')->group(function (): void {
+            Route::post('/logout', [
+                AuthController::class,
+                'logout',
+            ]);
+        });
+    });
+
+    Route::middleware('auth:sanctum')->get('/me', [
+        AuthController::class,
+        'me',
+    ]);
 });
