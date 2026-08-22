@@ -72,6 +72,13 @@ class Event extends Model
             ->orderBy('position');
     }
 
+    public function reviews(): HasMany
+    {
+        return $this
+            ->hasMany(Review::class)
+            ->latest();
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query

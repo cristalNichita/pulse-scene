@@ -4,6 +4,8 @@ namespace Tests\Feature\Api\V1;
 
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\Review;
+use App\Models\User;
 use App\Models\Venue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -203,5 +205,46 @@ class EventCatalogTest extends TestCase
             ->assertJsonValidationErrors([
                 'price',
             ]);
+    }
+
+    public function test_event_details_include_review_aggregates(): void
+    {
+        $event = Event::factory()->create([
+            'slug' => 'electric-nights',
+        ]);
+
+        $firstUser = User::factory()->create();
+        $secondUser = User::factory()->create();
+
+        Review::factory()->create([
+            'event_id' => $event->id,
+            'user_id' => $firstUser->id,
+            'rating' => 5,
+        ]);
+
+        Review::factory()->create([
+            'event_id' => $event->id,
+            'user_id' => $secondUser->id,
+            'rating' => 4,
+        ]);
+
+        $response = $this->getJson(
+            '/api/v1/events/electric-nights',
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath(
+                'data.rating',
+                4.5,
+            )
+            ->assertJsonPath(
+                'data.review_count',
+                2,
+            )
+            ->assertJsonCount(
+                2,
+                'data.reviews',
+            );
     }
 }

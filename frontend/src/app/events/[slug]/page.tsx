@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { getEventBySlug } from "@/features/events/api/events-api";
 import { EventDetailsContent } from "@/features/events/components/event-details-content";
 import { EventDetailsHero } from "@/features/events/components/event-details-hero";
-import { getDemoEventBySlug } from "@/features/events/data/demo-event-details";
-import { allDemoEvents } from "@/features/events/data/demo-events";
+import { ApiError } from "@/lib/api/api-error";
 import {SiteFooter} from "@/components/layout/site-footer";
 
 interface EventPageProps {
@@ -13,10 +13,19 @@ interface EventPageProps {
     }>;
 }
 
-export function generateStaticParams() {
-    return allDemoEvents.map((event) => ({
-        slug: event.slug,
-    }));
+async function resolveEvent(slug: string) {
+    try {
+        return await getEventBySlug(slug);
+    } catch (error) {
+        if (
+            error instanceof ApiError &&
+            error.status === 404
+        ) {
+            notFound();
+        }
+
+        throw error;
+    }
 }
 
 export async function generateMetadata({
@@ -24,13 +33,7 @@ export async function generateMetadata({
                                        }: EventPageProps): Promise<Metadata> {
     const { slug } = await params;
 
-    const event = getDemoEventBySlug(slug);
-
-    if (!event) {
-        return {
-            title: "Event not found",
-        };
-    }
+    const event = await resolveEvent(slug);
 
     return {
         title: event.title,
@@ -43,11 +46,7 @@ export default async function EventPage({
                                         }: EventPageProps) {
     const { slug } = await params;
 
-    const event = getDemoEventBySlug(slug);
-
-    if (!event) {
-        notFound();
-    }
+    const event = await resolveEvent(slug);
 
     return (
         <main>

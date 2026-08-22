@@ -6,9 +6,12 @@ use App\Enums\EventStatus;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Organizer;
+use App\Models\Review;
+use App\Models\User;
 use App\Models\Venue;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class PulseDemoSeeder extends Seeder
 {
@@ -24,6 +27,8 @@ class PulseDemoSeeder extends Seeder
                 venues: $venues,
                 organizers: $organizers,
             );
+
+            $this->seedReviews();
         });
     }
 
@@ -426,6 +431,57 @@ TEXT,
                     'position' => $position,
                 ]);
             }
+        }
+    }
+
+    private function seedReviews(): void
+    {
+        $event = Event::query()
+            ->where('slug', 'electric-nights')
+            ->firstOrFail();
+
+        $reviewers = [
+            [
+                'name' => 'Maya Rusu',
+                'email' => 'maya@example.com',
+                'rating' => 5,
+                'body' => 'The atmosphere was incredible. Great music, beautiful lights and a crowd that actually came to enjoy the night.',
+            ],
+            [
+                'name' => 'Victor Ceban',
+                'email' => 'victor@example.com',
+                'rating' => 5,
+                'body' => 'One of the best open-air events I have been to in Chișinău. The location worked perfectly after sunset.',
+            ],
+            [
+                'name' => 'Sofia Rotaru',
+                'email' => 'sofia@example.com',
+                'rating' => 4,
+                'body' => 'Really strong production and a great lineup. I would definitely come back next year.',
+            ],
+        ];
+
+        foreach ($reviewers as $data) {
+            $user = User::query()->updateOrCreate(
+                [
+                    'email' => $data['email'],
+                ],
+                [
+                    'name' => $data['name'],
+                    'password' => Hash::make('password'),
+                ],
+            );
+
+            Review::query()->updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'event_id' => $event->id,
+                ],
+                [
+                    'rating' => $data['rating'],
+                    'body' => $data['body'],
+                ],
+            );
         }
     }
 }

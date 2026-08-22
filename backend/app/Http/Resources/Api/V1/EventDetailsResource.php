@@ -28,6 +28,13 @@ class EventDetailsResource extends JsonResource
             'capacity' => $this->capacity,
             'minimum_age' => $this->minimum_age,
 
+            'rating' => round(
+                (float) ($this->reviews_avg_rating ?? 0),
+                1,
+            ),
+
+            'review_count' => (int) ($this->reviews_count ?? 0),
+
             'image_url' => $this->cover_image,
 
             'category' => new CategoryResource(
@@ -52,6 +59,10 @@ class EventDetailsResource extends JsonResource
                     ],
                 )
                 ->values(),
+
+            'reviews' => ReviewResource::collection(
+                $this->whenLoaded('reviews'),
+            ),
 
             'is_featured' => $this->is_featured,
         ];

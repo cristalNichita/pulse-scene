@@ -8,6 +8,7 @@ use App\Models\Event;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EventRepository implements EventRepositoryInterface
 {
@@ -43,7 +44,12 @@ class EventRepository implements EventRepositoryInterface
                 'venue',
                 'organizer',
                 'images',
+                'reviews' => fn (HasMany $relation) => $relation
+                    ->with('user')
+                    ->limit(6),
             ])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->where('slug', $slug)
             ->firstOrFail();
     }

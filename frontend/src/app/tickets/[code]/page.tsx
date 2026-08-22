@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 
 import { Container } from "@/components/ui/container";
 import { DigitalTicket } from "@/features/booking/components/digital-ticket";
-import { getDemoEventBySlug } from "@/features/events/data/demo-event-details";
+import { getEventBySlug } from "@/features/events/api/events-api";
+import { ApiError } from "@/lib/api/api-error";
 
 interface TicketPageProps {
     params: Promise<{
@@ -28,16 +29,34 @@ export default async function TicketPage({
         notFound();
     }
 
-    const event = getDemoEventBySlug(query.event);
+    let event;
 
-    if (!event) {
-        notFound();
+    try {
+        event = await getEventBySlug(
+            query.event,
+        );
+    } catch (error) {
+        if (
+            error instanceof ApiError &&
+            error.status === 404
+        ) {
+            notFound();
+        }
+
+        throw error;
     }
 
-    const requestedQuantity = Number(query.quantity ?? 1);
+    const requestedQuantity = Number(
+        query.quantity ?? 1,
+    );
 
-    const quantity = Number.isFinite(requestedQuantity)
-        ? Math.min(8, Math.max(1, requestedQuantity))
+    const quantity = Number.isFinite(
+        requestedQuantity,
+    )
+        ? Math.min(
+            8,
+            Math.max(1, requestedQuantity),
+        )
         : 1;
 
     return (

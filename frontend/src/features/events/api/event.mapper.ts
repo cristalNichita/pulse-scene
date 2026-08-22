@@ -1,4 +1,8 @@
-import type { EventApiPreview } from "@/features/events/api/event-api.types";
+import type {
+    EventApiDetails,
+    EventApiPreview,
+} from "@/features/events/api/event-api.types";
+import type { EventDetails } from "@/features/events/types/event-details";
 import type { EventPreview } from "@/features/events/types/event";
 
 export function mapEventPreview(
@@ -31,5 +35,45 @@ export function mapEventPreview(
         },
 
         isFeatured: event.is_featured,
+    };
+}
+
+export function mapEventDetails(
+    event: EventApiDetails,
+): EventDetails {
+    const longDescription = event.content
+        ? event.content
+            .split(/\n\s*\n/)
+            .map((paragraph) => paragraph.trim())
+            .filter(Boolean)
+        : [event.description];
+
+    return {
+        ...mapEventPreview(event),
+
+        longDescription,
+
+        rating: event.rating,
+        reviewCount: event.review_count,
+
+        organizer: {
+            id: event.organizer.id,
+            name: event.organizer.name,
+            description:
+                event.organizer.description ?? "",
+        },
+
+        venueAddress:
+            event.venue.address ??
+            `${event.venue.name}, ${event.venue.city}`,
+
+        ageRestriction:
+            event.minimum_age !== null
+                ? `${event.minimum_age}+`
+                : undefined,
+
+        gallery: event.gallery.map(
+            (image) => image.url,
+        ),
     };
 }
