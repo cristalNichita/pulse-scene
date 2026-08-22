@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import {
     CalendarDays,
     Minus,
@@ -15,25 +12,24 @@ import {
     formatPrice,
     formatPriceFrom,
 } from "@/lib/formatters";
+import { MAX_TICKET_QUANTITY } from "@/features/booking/lib/booking";
 
 interface EventBookingCardProps {
     event: EventDetails;
+    quantity: number;
+    onDecrease: () => void;
+    onIncrease: () => void;
+    onBook: () => void;
 }
 
 export function EventBookingCard({
                                      event,
+                                     quantity,
+                                     onDecrease,
+                                     onIncrease,
+                                     onBook,
                                  }: EventBookingCardProps) {
-    const [quantity, setQuantity] = useState(1);
-
     const total = event.priceFrom * quantity;
-
-    function decrementQuantity() {
-        setQuantity((current) => Math.max(1, current - 1));
-    }
-
-    function incrementQuantity() {
-        setQuantity((current) => Math.min(8, current + 1));
-    }
 
     return (
         <aside className="lg:sticky lg:top-8">
@@ -86,14 +82,14 @@ export function EventBookingCard({
                             </p>
 
                             <p className="mt-1 text-xs text-ink/40">
-                                Max. 8 tickets
+                                Max. {MAX_TICKET_QUANTITY} tickets
                             </p>
                         </div>
 
                         <div className="flex items-center rounded-pill border border-ink/10 bg-paper">
                             <button
                                 type="button"
-                                onClick={decrementQuantity}
+                                onClick={onDecrease}
                                 disabled={quantity === 1}
                                 aria-label="Decrease quantity"
                                 className="flex size-10 items-center justify-center rounded-pill text-ink transition-colors hover:bg-white disabled:opacity-25"
@@ -107,8 +103,8 @@ export function EventBookingCard({
 
                             <button
                                 type="button"
-                                onClick={incrementQuantity}
-                                disabled={quantity === 8}
+                                onClick={onIncrease}
+                                disabled={quantity === MAX_TICKET_QUANTITY}
                                 aria-label="Increase quantity"
                                 className="flex size-10 items-center justify-center rounded-pill text-ink transition-colors hover:bg-white disabled:opacity-25"
                             >
@@ -129,6 +125,7 @@ export function EventBookingCard({
 
                     <button
                         type="button"
+                        onClick={onBook}
                         className="h-14 w-full rounded-pill bg-accent text-sm font-semibold text-white transition-all duration-300 ease-smooth hover:-translate-y-0.5 hover:bg-accent-hover"
                     >
                         Book now

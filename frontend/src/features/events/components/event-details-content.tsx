@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 
 import { Container } from "@/components/ui/container";
-import { EventBookingCard } from "@/features/booking/components/event-booking-card";
+import { BookingFlow } from "@/features/booking/components/booking-flow";
 import { EventGallery } from "@/features/events/components/event-gallery";
 import type { EventDetails } from "@/features/events/types/event-details";
 import {
@@ -138,7 +138,7 @@ export function EventDetailsContent({
                         />
                     </div>
 
-                    <EventBookingCard event={event} />
+                    <BookingFlow event={event} />
                 </div>
             </Container>
         </section>

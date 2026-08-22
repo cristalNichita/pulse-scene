@@ -5,6 +5,7 @@ import { EventDetailsContent } from "@/features/events/components/event-details-
 import { EventDetailsHero } from "@/features/events/components/event-details-hero";
 import { getDemoEventBySlug } from "@/features/events/data/demo-event-details";
 import { allDemoEvents } from "@/features/events/data/demo-events";
+import {SiteFooter} from "@/components/layout/site-footer";
 
 interface EventPageProps {
     params: Promise<{
@@ -53,6 +54,8 @@ export default async function EventPage({
             <EventDetailsHero event={event} />
 
             <EventDetailsContent event={event} />
+
+            <SiteFooter />
         </main>
     );
 }
