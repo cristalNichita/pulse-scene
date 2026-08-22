@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Event;
 use App\Models\EventImage;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -10,15 +11,12 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class EventImageFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            //
+            'event_id' => Event::factory(),
+            'path' => '/images/events/electric-nights.jpeg',
+            'position' => 0,
         ];
     }
 }
