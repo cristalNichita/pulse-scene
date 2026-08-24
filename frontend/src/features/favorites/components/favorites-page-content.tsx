@@ -8,16 +8,17 @@ import {useRouter} from "next/navigation";
 import {SiteFooter} from "@/components/layout/site-footer";
 import {SiteHeader} from "@/components/layout/site-header";
 import {Container} from "@/components/ui/container";
-import {useAuth} from "@/features/auth/context/auth-context";
 import {EventCard} from "@/features/events/components/event-card";
-import {useFavorites} from "@/features/favorites/context/favorites-context";
+import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
+import { useFavorites } from "@/features/favorites/hooks/use-favorites";
 
 export function FavoritesPageContent() {
     const router = useRouter();
 
     const {
-        status,
-    } = useAuth();
+        data: user,
+        isPending: isAuthPending,
+    } = useCurrentUser();
 
     const {
         favorites,
@@ -25,22 +26,26 @@ export function FavoritesPageContent() {
     } = useFavorites();
 
     useEffect(() => {
-        if (status === "guest") {
+        if (
+            !isAuthPending &&
+            !user
+        ) {
             router.replace(
                 "/login?next=%2Ffavorites",
             );
         }
     }, [
-        status,
+        isAuthPending,
+        user,
         router,
     ]);
 
     if (
-        status === "loading" ||
-        status === "guest"
+        isAuthPending ||
+        !user
     ) {
         return (
-            <main className="min-h-screen bg-canvas"/>
+            <main className="min-h-screen bg-canvas" />
         );
     }
 

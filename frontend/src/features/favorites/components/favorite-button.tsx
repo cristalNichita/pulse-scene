@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { Heart } from "lucide-react";
 
 import type { EventPreview } from "@/features/events/types/event";
-import { useFavorites } from "@/features/favorites/context/favorites-context";
+import { useFavorites } from "@/features/favorites/hooks/use-favorites";
+import { useToggleFavorite } from "@/features/favorites/hooks/use-toggle-favorite";
 import { cn } from "@/lib/cn";
 
 interface FavoriteButtonProps {
@@ -17,15 +17,19 @@ export function FavoriteButton({
                                    className,
                                }: FavoriteButtonProps) {
     const {
-        isFavorite,
-        toggleFavorite,
+        favorites,
         isLoading,
     } = useFavorites();
 
-    const [isPending, setIsPending] =
-        useState(false);
+    const {
+        toggleFavorite,
+        isPending,
+    } = useToggleFavorite();
 
-    const active = isFavorite(event.slug);
+    const active = favorites.some(
+        (item) =>
+            item.slug === event.slug,
+    );
 
     async function handleClick(
         clickEvent: React.MouseEvent<HTMLButtonElement>,
@@ -37,13 +41,7 @@ export function FavoriteButton({
             return;
         }
 
-        setIsPending(true);
-
-        try {
-            await toggleFavorite(event);
-        } finally {
-            setIsPending(false);
-        }
+        await toggleFavorite(event);
     }
 
     return (

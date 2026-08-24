@@ -1,21 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { BookingDrawer } from "@/features/booking/components/booking-drawer";
 import { BookingSuccess } from "@/features/booking/components/booking-success";
 import { EventBookingCard } from "@/features/booking/components/event-booking-card";
-import {
-    createDemoBookingCode,
-    MAX_TICKET_QUANTITY,
-} from "@/features/booking/lib/booking";
+import { createDemoBookingCode } from "@/features/booking/lib/booking";
+import { useBookingUiStore } from "@/features/booking/store/booking-ui-store";
 import type { EventDetails } from "@/features/events/types/event-details";
-
-type BookingStep =
-    | "idle"
-    | "checkout"
-    | "confirming"
-    | "success";
 
 interface BookingFlowProps {
     event: EventDetails;
@@ -24,10 +16,64 @@ interface BookingFlowProps {
 export function BookingFlow({
                                 event,
                             }: BookingFlowProps) {
-    const [quantity, setQuantity] = useState(1);
-    const [step, setStep] = useState<BookingStep>("idle");
+    const quantity =
+        useBookingUiStore(
+            (state) =>
+                state.quantities[
+                    event.slug
+                    ] ?? 1,
+        );
 
-    const bookingCode = createDemoBookingCode(event.id);
+    const activeEventSlug =
+        useBookingUiStore(
+            (state) =>
+                state.activeEventSlug,
+        );
+
+    const storedStep =
+        useBookingUiStore(
+            (state) => state.step,
+        );
+
+    const incrementQuantity =
+        useBookingUiStore(
+            (state) =>
+                state.incrementQuantity,
+        );
+
+    const decrementQuantity =
+        useBookingUiStore(
+            (state) =>
+                state.decrementQuantity,
+        );
+
+    const openCheckout =
+        useBookingUiStore(
+            (state) =>
+                state.openCheckout,
+        );
+
+    const setStep =
+        useBookingUiStore(
+            (state) =>
+                state.setStep,
+        );
+
+    const closeBooking =
+        useBookingUiStore(
+            (state) =>
+                state.closeBooking,
+        );
+
+    const step =
+        activeEventSlug === event.slug
+            ? storedStep
+            : "idle";
+
+    const bookingCode =
+        createDemoBookingCode(
+            event.id,
+        );
 
     const isOverlayOpen =
         step === "checkout" ||
@@ -39,54 +85,61 @@ export function BookingFlow({
             return;
         }
 
-        const previousOverflow = document.body.style.overflow;
+        const previousOverflow =
+            document.body.style.overflow;
 
-        document.body.style.overflow = "hidden";
+        document.body.style.overflow =
+            "hidden";
 
         return () => {
-            document.body.style.overflow = previousOverflow;
+            document.body.style.overflow =
+                previousOverflow;
         };
     }, [isOverlayOpen]);
 
     useEffect(() => {
-        function handleKeyDown(event: KeyboardEvent) {
-            if (event.key !== "Escape") {
+        function handleKeyDown(
+            keyboardEvent: KeyboardEvent,
+        ) {
+            if (
+                keyboardEvent.key !==
+                "Escape"
+            ) {
                 return;
             }
 
-            if (step === "checkout") {
-                setStep("idle");
-            }
-
-            if (step === "success") {
-                setStep("idle");
+            if (
+                step === "checkout" ||
+                step === "success"
+            ) {
+                closeBooking();
             }
         }
 
-        window.addEventListener("keydown", handleKeyDown);
+        window.addEventListener(
+            "keydown",
+            handleKeyDown,
+        );
 
         return () => {
-            window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener(
+                "keydown",
+                handleKeyDown,
+            );
         };
-    }, [step]);
-
-    function decrementQuantity() {
-        setQuantity((current) =>
-            Math.max(1, current - 1),
-        );
-    }
-
-    function incrementQuantity() {
-        setQuantity((current) =>
-            Math.min(MAX_TICKET_QUANTITY, current + 1),
-        );
-    }
+    }, [
+        step,
+        closeBooking,
+    ]);
 
     async function confirmBooking() {
         setStep("confirming");
 
         await new Promise((resolve) =>
-            window.setTimeout(resolve, 700),
+            window.setTimeout(
+                resolve,
+                700,
+            ),
         );
 
         setStep("success");
@@ -97,9 +150,21 @@ export function BookingFlow({
             <EventBookingCard
                 event={event}
                 quantity={quantity}
-                onDecrease={decrementQuantity}
-                onIncrease={incrementQuantity}
-                onBook={() => setStep("checkout")}
+                onDecrease={() =>
+                    decrementQuantity(
+                        event.slug,
+                    )
+                }
+                onIncrease={() =>
+                    incrementQuantity(
+                        event.slug,
+                    )
+                }
+                onBook={() =>
+                    openCheckout(
+                        event.slug,
+                    )
+                }
             />
 
             <BookingDrawer
@@ -109,21 +174,31 @@ export function BookingFlow({
                     step === "checkout" ||
                     step === "confirming"
                 }
-                isSubmitting={step === "confirming"}
+                isSubmitting={
+                    step === "confirming"
+                }
                 onClose={() => {
-                    if (step !== "confirming") {
-                        setStep("idle");
+                    if (
+                        step !== "confirming"
+                    ) {
+                        closeBooking();
                     }
                 }}
-                onConfirm={confirmBooking}
+                onConfirm={
+                    confirmBooking
+                }
             />
 
             <BookingSuccess
                 event={event}
                 bookingCode={bookingCode}
                 quantity={quantity}
-                isOpen={step === "success"}
-                onClose={() => setStep("idle")}
+                isOpen={
+                    step === "success"
+                }
+                onClose={
+                    closeBooking
+                }
             />
         </>
     );

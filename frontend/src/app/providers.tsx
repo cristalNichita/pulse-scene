@@ -1,7 +1,10 @@
 "use client";
 
-import { AuthProvider } from "@/features/auth/context/auth-context";
-import { FavoritesProvider } from "@/features/favorites/context/favorites-context";
+import {
+    QueryClient,
+    QueryClientProvider,
+} from "@tanstack/react-query";
+import { useState } from "react";
 
 interface ProvidersProps {
     children: React.ReactNode;
@@ -10,11 +13,22 @@ interface ProvidersProps {
 export function Providers({
                               children,
                           }: ProvidersProps) {
+    const [queryClient] = useState(
+        () =>
+            new QueryClient({
+                defaultOptions: {
+                    queries: {
+                        staleTime: 30_000,
+                        retry: 1,
+                        refetchOnWindowFocus: false,
+                    },
+                },
+            }),
+    );
+
     return (
-        <AuthProvider>
-            <FavoritesProvider>
-                {children}
-            </FavoritesProvider>
-        </AuthProvider>
+        <QueryClientProvider client={queryClient}>
+            {children}
+        </QueryClientProvider>
     );
 }

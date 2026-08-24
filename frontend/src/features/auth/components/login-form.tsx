@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import {AuthField} from "@/features/auth/components/auth-field";
-import {useAuth} from "@/features/auth/context/auth-context";
+import { useLogin } from "@/features/auth/hooks/use-login";
 import {
     getApiErrorMessage,
     getApiValidationErrors,
@@ -22,7 +22,7 @@ export function LoginForm({
                               redirectTo = "/",
                           }: LoginFormProps) {
     const router = useRouter();
-    const {login} = useAuth();
+    const login = useLogin();
 
     const [email, setEmail] =
         useState("");
@@ -39,9 +39,6 @@ export function LoginForm({
     const [message, setMessage] =
         useState<string | null>(null);
 
-    const [isSubmitting, setIsSubmitting] =
-        useState(false);
-
     async function handleSubmit(
         event: SyntheticEvent<HTMLFormElement>,
     ) {
@@ -49,10 +46,9 @@ export function LoginForm({
 
         setErrors({});
         setMessage(null);
-        setIsSubmitting(true);
 
         try {
-            await login({
+            await login.mutateAsync({
                 email,
                 password,
                 remember,
@@ -71,8 +67,6 @@ export function LoginForm({
                     "We couldn't sign you in.",
                 ),
             );
-        } finally {
-            setIsSubmitting(false);
         }
     }
 
@@ -137,10 +131,10 @@ export function LoginForm({
 
             <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={login.isPending}
                 className="h-14 w-full rounded-pill bg-ink text-sm font-semibold text-white transition hover:bg-canvas-soft disabled:pointer-events-none disabled:opacity-60"
             >
-                {isSubmitting
+                {login.isPending
                     ? "Signing in..."
                     : "Sign in"}
             </button>

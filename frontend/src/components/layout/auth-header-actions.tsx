@@ -10,25 +10,27 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/features/auth/context/auth-context";
+import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
+import { useLogout } from "@/features/auth/hooks/use-logout";
 
 export function AuthHeaderActions() {
     const router = useRouter();
 
     const {
-        user,
-        status,
-        logout,
-    } = useAuth();
+        data: user,
+        isPending,
+    } = useCurrentUser();
+
+    const logout = useLogout();
 
     async function handleLogout() {
-        await logout();
+        await logout.mutateAsync();
 
         router.push("/");
         router.refresh();
     }
 
-    if (status === "loading") {
+    if (isPending) {
         return (
             <div className="h-12 w-20 animate-pulse rounded-pill bg-white/10" />
         );
@@ -38,7 +40,9 @@ export function AuthHeaderActions() {
         return (
             <Button
                 variant="light"
-                onClick={() => router.push("/login")}
+                onClick={() =>
+                    router.push("/login")
+                }
             >
                 Sign in
             </Button>
@@ -46,14 +50,14 @@ export function AuthHeaderActions() {
     }
 
     return (
-        <details className="group relative cursor-pointer">
+        <details className="group relative">
             <summary className="flex h-12 list-none items-center gap-3 rounded-pill bg-white py-1.5 pl-2 pr-4 text-ink transition hover:bg-paper [&::-webkit-details-marker]:hidden">
-                <span className="flex size-9 items-center justify-center rounded-full bg-ink text-xs font-semibold text-white">
-                  {user.name
-                      .trim()
-                      .charAt(0)
-                      .toUpperCase()}
-                </span>
+        <span className="flex size-9 items-center justify-center rounded-full bg-ink text-xs font-semibold text-white">
+          {user.name
+              .trim()
+              .charAt(0)
+              .toUpperCase()}
+        </span>
 
                 <span className="hidden max-w-28 truncate text-sm font-medium sm:block">
           {user.name}
@@ -77,7 +81,6 @@ export function AuthHeaderActions() {
                         className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition hover:bg-ink/5"
                     >
                         <Heart className="size-4 text-ink/45" />
-
                         Favorites
                     </Link>
 
@@ -86,7 +89,6 @@ export function AuthHeaderActions() {
                         className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition hover:bg-ink/5"
                     >
                         <Ticket className="size-4 text-ink/45" />
-
                         My tickets
                     </Link>
 
@@ -95,7 +97,6 @@ export function AuthHeaderActions() {
                         className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition hover:bg-ink/5"
                     >
                         <UserRound className="size-4 text-ink/45" />
-
                         Profile
                     </Link>
                 </nav>
@@ -103,12 +104,15 @@ export function AuthHeaderActions() {
                 <div className="border-t border-ink/10 pt-2">
                     <button
                         type="button"
+                        disabled={logout.isPending}
                         onClick={handleLogout}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition hover:bg-ink/5"
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition hover:bg-ink/5 disabled:opacity-50"
                     >
                         <LogOut className="size-4 text-ink/45" />
 
-                        Sign out
+                        {logout.isPending
+                            ? "Signing out..."
+                            : "Sign out"}
                     </button>
                 </div>
             </div>

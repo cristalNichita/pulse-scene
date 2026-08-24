@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import {AuthField} from "@/features/auth/components/auth-field";
-import {useAuth} from "@/features/auth/context/auth-context";
+import { useRegister } from "@/features/auth/hooks/use-register";
 import {
     getApiErrorMessage,
     getApiValidationErrors,
@@ -22,7 +22,7 @@ export function RegisterForm({
                                  redirectTo = "/",
                              }: RegisterFormProps) {
     const router = useRouter();
-    const {register} = useAuth();
+    const register = useRegister();
 
     const [name, setName] =
         useState("");
@@ -44,9 +44,6 @@ export function RegisterForm({
     const [message, setMessage] =
         useState<string | null>(null);
 
-    const [isSubmitting, setIsSubmitting] =
-        useState(false);
-
     async function handleSubmit(
         event: SyntheticEvent<HTMLFormElement>,
     ) {
@@ -54,10 +51,9 @@ export function RegisterForm({
 
         setErrors({});
         setMessage(null);
-        setIsSubmitting(true);
 
         try {
-            await register({
+            await register.mutateAsync({
                 name,
                 email,
                 password,
@@ -77,8 +73,6 @@ export function RegisterForm({
                     "We couldn't create your account.",
                 ),
             );
-        } finally {
-            setIsSubmitting(false);
         }
     }
 
@@ -154,10 +148,10 @@ export function RegisterForm({
 
             <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={register.isPending}
                 className="h-14 w-full rounded-pill bg-accent text-sm font-semibold text-white transition hover:bg-accent-hover disabled:pointer-events-none disabled:opacity-60"
             >
-                {isSubmitting
+                {register.isPending
                     ? "Creating account..."
                     : "Create account"}
             </button>
