@@ -95,4 +95,9 @@ class Event extends Model
     {
         return $this->hasMany(Favorite::class);
     }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
 }

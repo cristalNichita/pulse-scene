@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import {ArrowUpRight, Heart} from "lucide-react";
+import {ArrowUpRight} from "lucide-react";
 
 import {SiteHeader} from "@/components/layout/site-header";
 import {buttonVariants} from "@/components/ui/button";
 import {Container} from "@/components/ui/container";
 import {DiscoveryBar} from "@/features/events/components/discovery-bar";
+import { FavoriteButton } from "@/features/favorites/components/favorite-button";
 import type {EventPreview} from "@/features/events/types/event";
 import {
     formatEventDay,
@@ -58,13 +59,7 @@ export function FeaturedEventHero({
             </span>
                     </div>
 
-                    <button
-                        type="button"
-                        aria-label={`Save ${event.title}`}
-                        className="hidden size-12 items-center justify-center rounded-pill border border-white/20 bg-black/15 backdrop-blur-md transition-colors duration-300 hover:bg-white hover:text-ink sm:flex"
-                    >
-                        <Heart className="size-4.75"/>
-                    </button>
+                    <FavoriteButton event={event} />
                 </div>
 
                 <div className="grid items-end gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">

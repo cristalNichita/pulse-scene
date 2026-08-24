@@ -53,7 +53,7 @@ export function FavoriteButton({
                     : `Save ${event.title} to favorites`
             }
             aria-pressed={active}
-            disabled={isPending || isLoading}
+            disabled={isPending}
             onClick={handleClick}
             className={cn(
                 "flex size-11 items-center justify-center rounded-pill border backdrop-blur-md transition-all duration-300",

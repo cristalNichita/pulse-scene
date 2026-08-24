@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\FavoriteController;
@@ -85,6 +86,26 @@ Route::prefix('v1')->group(function (): void {
 
         Route::delete('/events/{slug}/favorite', [
             FavoriteController::class,
+            'destroy',
+        ]);
+
+        Route::get('/me/bookings', [
+            BookingController::class,
+            'index',
+        ]);
+
+        Route::post('/bookings', [
+            BookingController::class,
+            'store',
+        ]);
+
+        Route::get('/bookings/{booking}', [
+            BookingController::class,
+            'show',
+        ]);
+
+        Route::delete('/bookings/{booking}', [
+            BookingController::class,
             'destroy',
         ]);
     });
