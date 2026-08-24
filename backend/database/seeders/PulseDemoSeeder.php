@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Enums\BookingStatus;
 use App\Enums\EventStatus;
+use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\Favorite;
 use App\Models\Organizer;
 use App\Models\Review;
 use App\Models\User;
@@ -29,6 +32,7 @@ class PulseDemoSeeder extends Seeder
             );
 
             $this->seedReviews();
+            $this->seedDemoAccount();
         });
     }
 
@@ -505,6 +509,98 @@ TEXT,
                 [
                     'rating' => $data['rating'],
                     'body' => $data['body'],
+                ],
+            );
+        }
+    }
+
+    private function seedDemoAccount(): void
+    {
+        $user = User::query()->updateOrCreate(
+            [
+                'email' => 'demo@pulsescene.test',
+            ],
+            [
+                'name' => 'Alex Morgan',
+                'password' => Hash::make('pulse2026'),
+            ],
+        );
+
+        $favoriteEvents = Event::query()
+            ->whereIn('slug', [
+                'electric-nights',
+                'tech-future-2026',
+                'midnight-jazz-session',
+            ])
+            ->get();
+
+        foreach ($favoriteEvents as $event) {
+            Favorite::query()->firstOrCreate([
+                'user_id' => $user->id,
+                'event_id' => $event->id,
+            ]);
+        }
+
+        $bookingEvents = Event::query()
+            ->whereIn('slug', [
+                'electric-nights',
+                'rooftop-cinema-night',
+            ])
+            ->get()
+            ->keyBy('slug');
+
+        $electricNights = $bookingEvents->get(
+            'electric-nights',
+        );
+
+        if ($electricNights) {
+            Booking::query()->updateOrCreate(
+                [
+                    'code' => 'PLS-DEMO01',
+                ],
+                [
+                    'user_id' => $user->id,
+                    'event_id' => $electricNights->id,
+
+                    'quantity' => 2,
+
+                    'unit_price' => $electricNights->price,
+                    'total_price' => (float) $electricNights->price * 2,
+
+                    'currency' => $electricNights->currency,
+
+                    'status' => BookingStatus::Confirmed,
+
+                    'booked_at' => now()->subDays(2),
+                    'cancelled_at' => null,
+                ],
+            );
+        }
+
+        $rooftopCinema = $bookingEvents->get(
+            'rooftop-cinema-night',
+        );
+
+        if ($rooftopCinema) {
+            Booking::query()->updateOrCreate(
+                [
+                    'code' => 'PLS-DEMO02',
+                ],
+                [
+                    'user_id' => $user->id,
+                    'event_id' => $rooftopCinema->id,
+
+                    'quantity' => 1,
+
+                    'unit_price' => $rooftopCinema->price,
+                    'total_price' => (float) $rooftopCinema->price,
+
+                    'currency' => $rooftopCinema->currency,
+
+                    'status' => BookingStatus::Cancelled,
+
+                    'booked_at' => now()->subDays(4),
+                    'cancelled_at' => now()->subDay(),
                 ],
             );
         }
