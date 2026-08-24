@@ -7,6 +7,7 @@ import {
 import { Container } from "@/components/ui/container";
 import { BookingFlow } from "@/features/booking/components/booking-flow";
 import { EventGallery } from "@/features/events/components/event-gallery";
+import { EventReviewsSection } from "@/features/reviews/components/event-reviews-section";
 import type { EventDetails } from "@/features/events/types/event-details";
 import {
     formatEventLongDate,
@@ -140,6 +141,7 @@ export function EventDetailsContent({
 
                     <BookingFlow event={event} />
                 </div>
+                <EventReviewsSection event={event} />
             </Container>
         </section>
     );

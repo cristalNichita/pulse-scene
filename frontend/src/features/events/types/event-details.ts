@@ -1,4 +1,5 @@
 import type { EventPreview } from "@/features/events/types/event";
+import type { Review } from "@/features/reviews/types/review";
 
 export interface EventOrganizer {
     id: number;
@@ -19,4 +20,6 @@ export interface EventDetails extends EventPreview {
     ageRestriction?: string;
 
     gallery: string[];
+
+    reviews: Review[];
 }

@@ -75,5 +75,21 @@ export function mapEventDetails(
         gallery: event.gallery.map(
             (image) => image.url,
         ),
+
+        reviews: event.reviews.map(
+            (review) => ({
+                id: review.id,
+
+                rating: review.rating,
+                body: review.body,
+
+                author: {
+                    id: review.author.id,
+                    name: review.author.name,
+                },
+
+                createdAt: review.created_at,
+            }),
+        ),
     };
 }

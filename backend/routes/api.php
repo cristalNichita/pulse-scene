@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\HomeController;
+use App\Http\Controllers\Api\V1\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', function () {
@@ -107,6 +108,11 @@ Route::prefix('v1')->group(function (): void {
         Route::delete('/bookings/{booking}', [
             BookingController::class,
             'destroy',
+        ]);
+
+        Route::post('/events/{slug}/reviews', [
+            ReviewController::class,
+            'store',
         ]);
     });
 });
