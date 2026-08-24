@@ -16,6 +16,6 @@ export function mapCategoryPreview(
 
         imageUrl:
             category.image_url ??
-            "/images/events/digital-art.jpeg",
+            "/images/events/digital-art.jpg",
     };
 }
