@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,14 @@ Route::get('/health', function () {
 });
 
 Route::prefix('v1')->group(function (): void {
+    /*
+    |--------------------------------------------------------------------------
+    | Public discovery
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/home', HomeController::class);
+
     Route::get('/categories', [
         CategoryController::class,
         'index',
@@ -29,7 +38,11 @@ Route::prefix('v1')->group(function (): void {
         'show',
     ]);
 
-    Route::get('/home', HomeController::class);
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication
+    |--------------------------------------------------------------------------
+    */
 
     Route::prefix('auth')->group(function (): void {
         Route::post('/register', [
@@ -41,17 +54,38 @@ Route::prefix('v1')->group(function (): void {
             AuthController::class,
             'login',
         ]);
-
-        Route::middleware('auth:sanctum')->group(function (): void {
-            Route::post('/logout', [
-                AuthController::class,
-                'logout',
-            ]);
-        });
     });
 
-    Route::middleware('auth:sanctum')->get('/me', [
-        AuthController::class,
-        'me',
-    ]);
+    /*
+    |--------------------------------------------------------------------------
+    | Authenticated user
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware('auth:sanctum')->group(function (): void {
+        Route::post('/auth/logout', [
+            AuthController::class,
+            'logout',
+        ]);
+
+        Route::get('/me', [
+            AuthController::class,
+            'me',
+        ]);
+
+        Route::get('/me/favorites', [
+            FavoriteController::class,
+            'index',
+        ]);
+
+        Route::post('/events/{slug}/favorite', [
+            FavoriteController::class,
+            'store',
+        ]);
+
+        Route::delete('/events/{slug}/favorite', [
+            FavoriteController::class,
+            'destroy',
+        ]);
+    });
 });

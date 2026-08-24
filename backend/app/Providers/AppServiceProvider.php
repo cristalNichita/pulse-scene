@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Contracts\Repositories\CategoryRepositoryInterface;
 use App\Contracts\Repositories\EventRepositoryInterface;
+use App\Contracts\Repositories\FavoriteRepositoryInterface;
 use App\Repositories\Eloquent\CategoryRepository;
 use App\Repositories\Eloquent\EventRepository;
+use App\Repositories\Eloquent\FavoriteRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             CategoryRepositoryInterface::class,
             CategoryRepository::class,
+        );
+
+        $this->app->bind(
+            FavoriteRepositoryInterface::class,
+            FavoriteRepository::class,
         );
     }
 
