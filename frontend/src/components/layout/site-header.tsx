@@ -3,6 +3,7 @@ import { MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { AuthHeaderActions } from "@/components/layout/auth-header-actions";
 
 const navigation = [
     {
@@ -52,9 +53,7 @@ export function SiteHeader() {
                         Chișinău
                     </Button>
 
-                    <Button variant="light">
-                        Sign in
-                    </Button>
+                    <AuthHeaderActions />
                 </div>
             </Container>
         </header>

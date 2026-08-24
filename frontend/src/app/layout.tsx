@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist } from "next/font/google";
+import { Providers } from "@/app/providers";
 
 import "./globals.css";
 
@@ -31,9 +32,11 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
       <html lang="en">
-      <body className={`${geist.variable} ${cormorant.variable}`}>
-      {children}
-      </body>
+        <body className={`${geist.variable} ${cormorant.variable}`}>
+          <Providers>
+            {children}
+          </Providers>
+        </body>
       </html>
   );
 }
