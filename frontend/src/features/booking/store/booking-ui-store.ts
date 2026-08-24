@@ -5,7 +5,6 @@ import { MAX_TICKET_QUANTITY } from "@/features/booking/lib/booking";
 export type BookingStep =
     | "idle"
     | "checkout"
-    | "confirming"
     | "success";
 
 interface BookingUiState {
@@ -30,9 +29,7 @@ interface BookingUiState {
         eventSlug: string,
     ) => void;
 
-    setStep: (
-        step: BookingStep,
-    ) => void;
+    showSuccess: () => void;
 
     closeBooking: () => void;
 }
@@ -94,18 +91,14 @@ export const useBookingUiStore =
                 eventSlug,
             ) => {
                 set({
-                    activeEventSlug:
-                    eventSlug,
-
+                    activeEventSlug: eventSlug,
                     step: "checkout",
                 });
             },
 
-            setStep: (
-                step,
-            ) => {
+            showSuccess: () => {
                 set({
-                    step,
+                    step: "success",
                 });
             },
 

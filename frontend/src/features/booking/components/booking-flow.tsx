@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
+import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import { BookingDrawer } from "@/features/booking/components/booking-drawer";
 import { BookingSuccess } from "@/features/booking/components/booking-success";
 import { EventBookingCard } from "@/features/booking/components/event-booking-card";
-import { createDemoBookingCode } from "@/features/booking/lib/booking";
+import { useCreateBooking } from "@/features/booking/hooks/use-create-booking";
 import { useBookingUiStore } from "@/features/booking/store/booking-ui-store";
 import type { EventDetails } from "@/features/events/types/event-details";
 
@@ -16,6 +18,16 @@ interface BookingFlowProps {
 export function BookingFlow({
                                 event,
                             }: BookingFlowProps) {
+    const router = useRouter();
+
+    const {
+        data: user,
+        isPending: isAuthPending,
+    } = useCurrentUser();
+
+    const createBooking =
+        useCreateBooking();
+
     const quantity =
         useBookingUiStore(
             (state) =>
@@ -53,10 +65,10 @@ export function BookingFlow({
                 state.openCheckout,
         );
 
-    const setStep =
+    const showSuccess =
         useBookingUiStore(
             (state) =>
-                state.setStep,
+                state.showSuccess,
         );
 
     const closeBooking =
@@ -70,14 +82,8 @@ export function BookingFlow({
             ? storedStep
             : "idle";
 
-    const bookingCode =
-        createDemoBookingCode(
-            event.id,
-        );
-
     const isOverlayOpen =
         step === "checkout" ||
-        step === "confirming" ||
         step === "success";
 
     useEffect(() => {
@@ -109,6 +115,12 @@ export function BookingFlow({
             }
 
             if (
+                createBooking.isPending
+            ) {
+                return;
+            }
+
+            if (
                 step === "checkout" ||
                 step === "success"
             ) {
@@ -129,20 +141,38 @@ export function BookingFlow({
         };
     }, [
         step,
+        createBooking.isPending,
         closeBooking,
     ]);
 
+    function handleBook() {
+        if (isAuthPending) {
+            return;
+        }
+
+        if (!user) {
+            router.push(
+                `/login?next=${encodeURIComponent(
+                    `/events/${event.slug}`,
+                )}`,
+            );
+
+            return;
+        }
+
+        openCheckout(event.slug);
+    }
+
     async function confirmBooking() {
-        setStep("confirming");
+        const booking =
+            await createBooking.mutateAsync({
+                eventSlug: event.slug,
+                quantity,
+            });
 
-        await new Promise((resolve) =>
-            window.setTimeout(
-                resolve,
-                700,
-            ),
-        );
-
-        setStep("success");
+        if (booking) {
+            showSuccess();
+        }
     }
 
     return (
@@ -160,26 +190,21 @@ export function BookingFlow({
                         event.slug,
                     )
                 }
-                onBook={() =>
-                    openCheckout(
-                        event.slug,
-                    )
-                }
+                onBook={handleBook}
             />
 
             <BookingDrawer
                 event={event}
                 quantity={quantity}
                 isOpen={
-                    step === "checkout" ||
-                    step === "confirming"
+                    step === "checkout"
                 }
                 isSubmitting={
-                    step === "confirming"
+                    createBooking.isPending
                 }
                 onClose={() => {
                     if (
-                        step !== "confirming"
+                        !createBooking.isPending
                     ) {
                         closeBooking();
                     }
@@ -189,17 +214,23 @@ export function BookingFlow({
                 }
             />
 
-            <BookingSuccess
-                event={event}
-                bookingCode={bookingCode}
-                quantity={quantity}
-                isOpen={
-                    step === "success"
-                }
-                onClose={
-                    closeBooking
-                }
-            />
+            {createBooking.data ? (
+                <BookingSuccess
+                    event={event}
+                    bookingCode={
+                        createBooking.data.code
+                    }
+                    quantity={
+                        createBooking.data.quantity
+                    }
+                    isOpen={
+                        step === "success"
+                    }
+                    onClose={
+                        closeBooking
+                    }
+                />
+            ) : null}
         </>
     );
 }

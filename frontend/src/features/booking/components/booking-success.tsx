@@ -20,7 +20,6 @@ interface BookingSuccessProps {
 export function BookingSuccess({
                                    event,
                                    bookingCode,
-                                   quantity,
                                    isOpen,
                                    onClose,
                                }: BookingSuccessProps) {
@@ -29,9 +28,7 @@ export function BookingSuccess({
     }
 
     const ticketHref =
-        `/tickets/${bookingCode}` +
-        `?event=${encodeURIComponent(event.slug)}` +
-        `&quantity=${quantity}`;
+        `/tickets/${bookingCode}`;
 
     return (
         <div className="fixed inset-0 z-110 flex items-center justify-center p-5">

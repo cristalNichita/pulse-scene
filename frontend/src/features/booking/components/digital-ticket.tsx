@@ -7,14 +7,14 @@ import {
     Ticket,
 } from "lucide-react";
 
-import type { EventDetails } from "@/features/events/types/event-details";
+import type { EventPreview } from "@/features/events/types/event";
 import {
     formatEventLongDate,
     formatEventTime,
 } from "@/lib/formatters";
 
 interface DigitalTicketProps {
-    event: EventDetails;
+    event: EventPreview;
     bookingCode: string;
     quantity: number;
 }
