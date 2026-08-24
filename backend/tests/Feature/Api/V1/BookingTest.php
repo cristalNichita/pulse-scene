@@ -213,4 +213,26 @@ class BookingTest extends TestCase
                 'quantity',
             ]);
     }
+
+    public function test_user_cannot_cancel_someone_elses_booking(): void
+    {
+        $user = User::factory()->create();
+
+        $booking = Booking::factory()->create();
+
+        $this
+            ->actingAs($user)
+            ->deleteJson(
+                "/api/v1/bookings/{$booking->code}",
+            )
+            ->assertForbidden();
+
+        $this->assertDatabaseHas(
+            'bookings',
+            [
+                'id' => $booking->id,
+                'status' => BookingStatus::Confirmed->value,
+            ],
+        );
+    }
 }

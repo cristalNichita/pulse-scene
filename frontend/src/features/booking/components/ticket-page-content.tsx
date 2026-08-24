@@ -60,6 +60,36 @@ export function TicketPageContent({
         );
     }
 
+    if (booking.status === "cancelled") {
+        return (
+            <main className="min-h-screen bg-canvas text-white">
+                <Container>
+                    <div className="flex min-h-screen flex-col items-center justify-center text-center">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
+                            Booking cancelled
+                        </p>
+
+                        <h1 className="mt-5 max-w-2xl text-5xl font-medium tracking-[-0.06em] sm:text-6xl">
+                            This ticket is no longer active.
+                        </h1>
+
+                        <p className="mt-5 max-w-md text-sm leading-6 text-white/40">
+                            The booking was cancelled and this
+                            ticket can no longer be used for entry.
+                        </p>
+
+                        <Link
+                            href="/tickets"
+                            className="mt-8 rounded-pill bg-white px-6 py-3 text-sm font-semibold text-ink"
+                        >
+                            Back to my tickets
+                        </Link>
+                    </div>
+                </Container>
+            </main>
+        );
+    }
+
     return (
         <main className="min-h-screen bg-canvas py-8 text-white sm:py-12">
             <Container>

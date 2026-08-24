@@ -80,10 +80,17 @@ class BookingController extends Controller
             $booking,
         );
 
+        $booking = $this->bookings->cancel(
+            $booking,
+        );
+
+        $booking->load([
+            'event.category',
+            'event.venue',
+        ]);
+
         return new BookingResource(
-            $this->bookings->cancel(
-                $booking,
-            ),
+            $booking,
         );
     }
 }
