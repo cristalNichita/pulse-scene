@@ -1,22 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {useRouter} from "next/navigation";
 import {
     type SyntheticEvent,
     useState,
 } from "react";
 
-import { AuthField } from "@/features/auth/components/auth-field";
-import { useAuth } from "@/features/auth/context/auth-context";
+import {AuthField} from "@/features/auth/components/auth-field";
+import {useAuth} from "@/features/auth/context/auth-context";
 import {
     getApiErrorMessage,
     getApiValidationErrors,
 } from "@/lib/api/errors";
 
-export function LoginForm() {
+interface LoginFormProps {
+    redirectTo?: string;
+}
+
+export function LoginForm({
+                              redirectTo = "/",
+                          }: LoginFormProps) {
     const router = useRouter();
-    const { login } = useAuth();
+    const {login} = useAuth();
 
     const [email, setEmail] =
         useState("");
@@ -52,7 +58,7 @@ export function LoginForm() {
                 remember,
             });
 
-            router.push("/");
+            router.push(redirectTo);
             router.refresh();
         } catch (error) {
             setErrors(
@@ -69,6 +75,13 @@ export function LoginForm() {
             setIsSubmitting(false);
         }
     }
+
+    const registerHref =
+        redirectTo === "/"
+            ? "/register"
+            : `/register?next=${encodeURIComponent(
+                redirectTo,
+            )}`;
 
     return (
         <form
@@ -136,7 +149,7 @@ export function LoginForm() {
                 New to Pulse?{" "}
 
                 <Link
-                    href="/register"
+                    href={registerHref}
                     className="font-semibold text-ink transition hover:text-accent"
                 >
                     Create an account

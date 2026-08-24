@@ -1,22 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {useRouter} from "next/navigation";
 import {
     type SyntheticEvent,
     useState,
 } from "react";
 
-import { AuthField } from "@/features/auth/components/auth-field";
-import { useAuth } from "@/features/auth/context/auth-context";
+import {AuthField} from "@/features/auth/components/auth-field";
+import {useAuth} from "@/features/auth/context/auth-context";
 import {
     getApiErrorMessage,
     getApiValidationErrors,
 } from "@/lib/api/errors";
 
-export function RegisterForm() {
+interface RegisterFormProps {
+    redirectTo?: string;
+}
+
+export function RegisterForm({
+                                 redirectTo = "/",
+                             }: RegisterFormProps) {
     const router = useRouter();
-    const { register } = useAuth();
+    const {register} = useAuth();
 
     const [name, setName] =
         useState("");
@@ -58,7 +64,7 @@ export function RegisterForm() {
                 passwordConfirmation,
             });
 
-            router.push("/");
+            router.push(redirectTo);
             router.refresh();
         } catch (error) {
             setErrors(
@@ -76,89 +82,96 @@ export function RegisterForm() {
         }
     }
 
+    const loginHref =
+        redirectTo === "/"
+            ? "/login"
+            : `/login?next=${encodeURIComponent(
+                redirectTo,
+            )}`;
+
     return (
         <form
             onSubmit={handleSubmit}
-    className="space-y-5"
-    >
-    <AuthField
-        id="name"
-    label="Name"
-    autoComplete="name"
-    value={name}
-    error={errors.name}
-    onChange={(event) =>
-    setName(event.target.value)
-}
-    required
-    />
-
-    <AuthField
-        id="email"
-    label="Email"
-    type="email"
-    autoComplete="email"
-    value={email}
-    error={errors.email}
-    onChange={(event) =>
-    setEmail(event.target.value)
-}
-    required
-    />
-
-    <AuthField
-        id="password"
-    label="Password"
-    type="password"
-    autoComplete="new-password"
-    value={password}
-    error={errors.password}
-    onChange={(event) =>
-    setPassword(event.target.value)
-}
-    required
-    />
-
-    <AuthField
-        id="password-confirmation"
-    label="Confirm password"
-    type="password"
-    autoComplete="new-password"
-    value={passwordConfirmation}
-    onChange={(event) =>
-    setPasswordConfirmation(
-        event.target.value,
-    )
-}
-    required
-    />
-
-    {message ? (
-            <div className="rounded-2xl border border-accent/15 bg-accent/5 px-4 py-3 text-sm text-accent">
-                {message}
-                </div>
-        ) : null}
-
-    <button
-    type="submit"
-    disabled={isSubmitting}
-    className="h-14 w-full rounded-pill bg-accent text-sm font-semibold text-white transition hover:bg-accent-hover disabled:pointer-events-none disabled:opacity-60"
-    >
-    {isSubmitting
-        ? "Creating account..."
-        : "Create account"}
-    </button>
-
-    <p className="pt-2 text-center text-sm text-ink/45">
-        Already have an account?{" "}
-
-        <Link
-        href="/login"
-    className="font-semibold text-ink transition hover:text-accent"
+            className="space-y-5"
         >
-        Sign in
-        </Link>
-        </p>
+            <AuthField
+                id="name"
+                label="Name"
+                autoComplete="name"
+                value={name}
+                error={errors.name}
+                onChange={(event) =>
+                    setName(event.target.value)
+                }
+                required
+            />
+
+            <AuthField
+                id="email"
+                label="Email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                error={errors.email}
+                onChange={(event) =>
+                    setEmail(event.target.value)
+                }
+                required
+            />
+
+            <AuthField
+                id="password"
+                label="Password"
+                type="password"
+                autoComplete="new-password"
+                value={password}
+                error={errors.password}
+                onChange={(event) =>
+                    setPassword(event.target.value)
+                }
+                required
+            />
+
+            <AuthField
+                id="password-confirmation"
+                label="Confirm password"
+                type="password"
+                autoComplete="new-password"
+                value={passwordConfirmation}
+                onChange={(event) =>
+                    setPasswordConfirmation(
+                        event.target.value,
+                    )
+                }
+                required
+            />
+
+            {message ? (
+                <div className="rounded-2xl border border-accent/15 bg-accent/5 px-4 py-3 text-sm text-accent">
+                    {message}
+                </div>
+            ) : null}
+
+            <button
+                type="submit"
+                disabled={isSubmitting}
+                className="h-14 w-full rounded-pill bg-accent text-sm font-semibold text-white transition hover:bg-accent-hover disabled:pointer-events-none disabled:opacity-60"
+            >
+                {isSubmitting
+                    ? "Creating account..."
+                    : "Create account"}
+            </button>
+
+            <p className="pt-2 text-center text-sm text-ink/45">
+                Already have an account?{" "}
+
+                <Link
+                    href={loginHref}
+                    className="font-semibold text-ink transition hover:text-accent"
+                >
+                    Sign in
+                </Link>
+            </p>
         </form>
-);
+    );
 }

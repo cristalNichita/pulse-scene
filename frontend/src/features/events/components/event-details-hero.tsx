@@ -2,10 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import {
     ArrowLeft,
-    Heart,
     MapPin,
 } from "lucide-react";
 
+import { FavoriteButton } from "@/features/favorites/components/favorite-button";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Container } from "@/components/ui/container";
 import type { EventDetails } from "@/features/events/types/event-details";
@@ -51,13 +51,7 @@ export function EventDetailsHero({
                         Back to explore
                     </Link>
 
-                    <button
-                        type="button"
-                        aria-label={`Save ${event.title}`}
-                        className="flex size-11 items-center justify-center rounded-pill border border-white/15 bg-black/15 text-white backdrop-blur-md transition-all hover:border-white hover:bg-white hover:text-ink"
-                    >
-                        <Heart className="size-4.5" />
-                    </button>
+                    <FavoriteButton event={event} />
                 </div>
 
                 <div>

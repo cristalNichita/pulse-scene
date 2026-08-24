@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
 
 import type { EventPreview } from "@/features/events/types/event";
+import { FavoriteButton } from "@/features/favorites/components/favorite-button";
 import { cn } from "@/lib/cn";
 import {
     formatEventCardDate,
@@ -95,13 +95,10 @@ export function EventCard({
                 </div>
             </Link>
 
-            <button
-                type="button"
-                aria-label={`Save ${event.title}`}
-                className="absolute right-5 top-5 z-20 flex size-11 items-center justify-center rounded-pill border border-white/20 bg-black/15 text-white backdrop-blur-md transition-all duration-300 hover:border-white hover:bg-white hover:text-ink"
-            >
-                <Heart className="size-4.5" />
-            </button>
+            <FavoriteButton
+                event={event}
+                className="absolute right-5 top-5 z-20"
+            />
         </article>
     );
 }
